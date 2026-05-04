@@ -1,0 +1,75 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+secrets/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Java / JVM
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+replay_pid*
+out/
+target/
+bin/
+
+# Maven
+.mvn/timing.properties
+
+# Gradle
+.gradle/
+build/
+
+# Node / React
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+coverage/
+dist/
+vite.svg
+*.tsbuildinfo
+
+# Test and generated reports
+test-output/
+reports/
+allure-results/
+allure-report/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Local tooling
+.cache/
+.tmp/
+tmp/
+temp/
+
