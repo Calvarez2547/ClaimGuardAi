@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS app_metadata (
+    id BIGINT PRIMARY KEY,
+    application_name VARCHAR(100) NOT NULL,
+    backend_version VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

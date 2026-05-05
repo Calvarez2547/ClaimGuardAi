@@ -1,6 +1,5 @@
 # Version
 
-- `v0.1.0` - Project Foundation
+- `v0.2.0` - Backend Foundation
 
-This version establishes the initial ClaimGuard AI repository structure and documentation layout.
-
+This version establishes the backend starter architecture, configuration foundation, security baseline, migration scaffold, and initial health endpoint.
