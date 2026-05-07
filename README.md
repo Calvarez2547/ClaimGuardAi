@@ -12,7 +12,9 @@ ClaimGuard AI is a healthcare revenue cycle portfolio project focused on improvi
 
 ## Current status
 
-This repository is currently in the project foundation phase. The structure and documentation layout are in place so implementation can begin cleanly in later phases without mixing architecture setup with feature work.
+`v0.2.0 - Backend Foundation` is complete on the `feature/backend-foundation` branch.
+
+The backend now includes a Spring Boot service built with Maven and Java 21, local and test H2 support, a Flyway baseline migration, a security baseline, a health endpoint, structured error handling, correlation ID support, and starter automated tests.
 
 ## Repository layout
 
@@ -24,5 +26,5 @@ This repository is currently in the project foundation phase. The structure and 
 
 ## Initial development approach
 
-This first milestone intentionally avoids generating the backend or frontend applications. The goal is to keep the initial commit focused on repository hygiene, documentation organization, and a clear monorepo foundation.
+The repository started with a monorepo and documentation foundation, followed by a backend infrastructure milestone designed to establish platform conventions before domain feature development begins.
 
