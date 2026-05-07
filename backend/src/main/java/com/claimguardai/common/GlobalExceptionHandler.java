@@ -1,5 +1,6 @@
 package com.claimguardai.common;
 
+import com.claimguardai.auth.AuthenticationFailedException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -50,6 +52,32 @@ public class GlobalExceptionHandler {
                 request);
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+            HttpMessageNotReadableException exception,
+            HttpServletRequest request) {
+
+        ErrorResponse response = errorResponseFactory.build(
+                HttpStatus.BAD_REQUEST,
+                "Malformed JSON request body.",
+                request);
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(AuthenticationFailedException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationFailedException(
+            AuthenticationFailedException exception,
+            HttpServletRequest request) {
+
+        ErrorResponse response = errorResponseFactory.build(
+                HttpStatus.UNAUTHORIZED,
+                exception.getMessage(),
+                request);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     @ExceptionHandler(AccessDeniedException.class)

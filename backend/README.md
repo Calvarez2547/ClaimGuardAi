@@ -4,11 +4,11 @@ This module contains the Spring Boot backend foundation for ClaimGuard AI, a hea
 
 ## Current phase
 
-- `v0.2.0` - Backend Foundation
+- `v0.3.0` - Authentication and User Foundation
 
 ## Purpose
 
-This phase establishes the backend project structure, configuration model, security baseline, error-handling conventions, Flyway foundation, and initial health endpoint. It is intentionally limited to infrastructure and platform setup so later phases can add domain features cleanly.
+This phase establishes the authentication and user identity foundation on top of the backend baseline. It adds a minimal user model, role support, password hashing, JWT-based authentication, current-user lookup, and local or test bootstrap support without adding product workflows yet.
 
 ## Tech stack
 
@@ -46,7 +46,8 @@ These are supported now, even though some are placeholders for later phases:
 - `CLAIMGUARDAI_DB_PASSWORD` PostgreSQL password for the default profile
 - `CLAIMGUARDAI_CORS_ALLOWED_ORIGINS` comma-separated allowed frontend origins
 - `AI_API_KEY` reserved for a future AI integration phase
-- `JWT_SECRET` reserved for a future authentication phase
+- `JWT_SECRET` JWT signing secret for non-local environments, minimum 32 characters
+- `JWT_EXPIRATION_MINUTES` optional token lifetime override, defaults to `60`
 
 Optional local overrides:
 
@@ -55,8 +56,51 @@ Optional local overrides:
 - `CLAIMGUARDAI_LOCAL_DB_PASSWORD`
 - `CLAIMGUARDAI_LOCAL_DB_DRIVER`
 - `CLAIMGUARDAI_LOCAL_JPA_PLATFORM`
+- `CLAIMGUARDAI_LOCAL_SEED_USER_ENABLED`
+- `CLAIMGUARDAI_LOCAL_SEED_USER_USERNAME`
+- `CLAIMGUARDAI_LOCAL_SEED_USER_EMAIL`
+- `CLAIMGUARDAI_LOCAL_SEED_USER_PASSWORD`
 
-## Health endpoint
+The local profile also provides a default JWT secret and a default seeded user so the phase can be exercised without extra setup.
+
+## Authentication endpoints
+
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+
+Example login request:
+
+```json
+{
+  "username": "local.analyst",
+  "password": "LocalPass123!"
+}
+```
+
+Example login response shape:
+
+```json
+{
+  "accessToken": "<jwt>",
+  "tokenType": "Bearer",
+  "expiresAt": "2026-05-07T00:00:00Z"
+}
+```
+
+Current-user response shape:
+
+```json
+{
+  "id": 1,
+  "username": "local.analyst",
+  "email": "local.analyst@claimguardai.local",
+  "roles": [
+    "USER"
+  ]
+}
+```
+
+## Public health endpoint
 
 - `GET /api/health`
 
@@ -66,15 +110,13 @@ Example response:
 {
   "status": "UP",
   "application": "ClaimGuard AI Backend",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "environment": "local"
 }
 ```
 
 ## What is intentionally not implemented yet
 
-- JWT issuance or validation
-- user login or seeded application users
 - claim CRUD APIs
 - full PostgreSQL schema
 - rule engine logic
@@ -82,3 +124,4 @@ Example response:
 - AI provider calls
 - dashboard or reporting endpoints
 - audit persistence implementation beyond structural foundations
+- admin user management workflows

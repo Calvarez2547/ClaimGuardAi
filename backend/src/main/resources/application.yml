@@ -25,12 +25,16 @@ spring:
 
 app:
   name: ClaimGuard AI Backend
-  version: 0.2.0
+  version: 0.3.0
   runtime-environment: ${CLAIMGUARDAI_RUNTIME_ENV:default}
   ai:
     api-key: ${AI_API_KEY:}
+  auth:
+    seed:
+      enabled: false
   jwt:
     secret: ${JWT_SECRET:}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
   security:
     cors:
       allowed-origins: ${CLAIMGUARDAI_CORS_ALLOWED_ORIGINS:http://localhost:5173}
@@ -50,6 +54,17 @@ spring:
 
 app:
   runtime-environment: local
+  auth:
+    seed:
+      enabled: ${CLAIMGUARDAI_LOCAL_SEED_USER_ENABLED:true}
+      username: ${CLAIMGUARDAI_LOCAL_SEED_USER_USERNAME:local.analyst}
+      email: ${CLAIMGUARDAI_LOCAL_SEED_USER_EMAIL:local.analyst@claimguardai.local}
+      password: ${CLAIMGUARDAI_LOCAL_SEED_USER_PASSWORD:LocalPass123!}
+      account-enabled: true
+      roles:
+        - USER
+  jwt:
+    secret: ${JWT_SECRET:local-development-jwt-secret-change-me-1234567890}
 
 ---
 spring:
@@ -66,3 +81,14 @@ spring:
 
 app:
   runtime-environment: test
+  auth:
+    seed:
+      enabled: true
+      username: local.analyst
+      email: local.analyst@claimguardai.local
+      password: LocalPass123!
+      account-enabled: true
+      roles:
+        - USER
+  jwt:
+    secret: test-jwt-secret-change-me-1234567890
