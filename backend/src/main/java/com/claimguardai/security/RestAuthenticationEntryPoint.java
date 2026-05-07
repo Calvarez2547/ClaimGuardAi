@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -32,11 +33,16 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        String message = "Authentication is required to access this resource.";
+        if (authException instanceof JwtAuthenticationException
+                && StringUtils.hasText(authException.getMessage())) {
+            message = authException.getMessage();
+        }
         objectMapper.writeValue(
                 response.getOutputStream(),
                 errorResponseFactory.build(
                         HttpStatus.UNAUTHORIZED,
-                        "Authentication is required to access this resource.",
+                        message,
                         request));
     }
 }

@@ -12,9 +12,9 @@ ClaimGuard AI is a healthcare revenue cycle portfolio project focused on improvi
 
 ## Current status
 
-`v0.2.0 - Backend Foundation` is complete on the `feature/backend-foundation` branch.
+`v0.3.0 - Authentication and User Foundation` is complete on the `feature/backend-foundation` branch.
 
-The backend now includes a Spring Boot service built with Maven and Java 21, local and test H2 support, a Flyway baseline migration, a security baseline, a health endpoint, structured error handling, correlation ID support, and starter automated tests.
+The backend now includes a Spring Boot service built with Maven and Java 21, local and test H2 support, Flyway migrations for backend and auth foundations, a deny-by-default security baseline, password hashing, JWT login and current-user endpoints, structured error handling, correlation ID support, and integration tests for the authentication flow.
 
 ## Repository layout
 
