@@ -4,11 +4,11 @@ This module contains the Spring Boot backend foundation for ClaimGuard AI, a hea
 
 ## Current phase
 
-- `v0.4.0` - Claim Intake Foundation
+- `v0.5.0` - Claim Lifecycle and Review Foundation
 
 ## Purpose
 
-This phase establishes the first claim domain foundation on top of authentication. It adds authenticated claim intake, user-owned claim persistence, secure claim lookup by ID, and current-user claim listing without adding AI analysis, scoring, routing, dashboards, admin workflows, or frontend work.
+This phase adds the basic owner-scoped claim lifecycle and review foundation on top of authenticated claim intake. It supports claim status updates and claim review notes without adding AI analysis, scoring, routing, dashboards, admin workflows, document upload, OCR, external integrations, or frontend work.
 
 ## Tech stack
 
@@ -107,6 +107,9 @@ All claim endpoints require a valid Bearer token.
 - `POST /api/claims`
 - `GET /api/claims/{claimId}`
 - `GET /api/claims`
+- `PATCH /api/claims/{claimId}/status`
+- `POST /api/claims/{claimId}/review-notes`
+- `GET /api/claims/{claimId}/review-notes`
 
 Example create-claim request:
 
@@ -143,6 +146,34 @@ Example claim response:
 
 Claim records are scoped to the authenticated user. Requests for another user's claim return the same structured not-found response as requests for a missing claim.
 
+Example status update request:
+
+```json
+{
+  "status": "IN_REVIEW"
+}
+```
+
+Example review note request:
+
+```json
+{
+  "noteText": "Reviewed claim details and flagged missing provider information."
+}
+```
+
+Example review note response:
+
+```json
+{
+  "id": 1,
+  "claimId": 1,
+  "noteText": "Reviewed claim details and flagged missing provider information.",
+  "createdAt": "2026-05-08T00:00:00Z",
+  "updatedAt": "2026-05-08T00:00:00Z"
+}
+```
+
 ## Public health endpoint
 
 - `GET /api/health`
@@ -153,14 +184,14 @@ Example response:
 {
   "status": "UP",
   "application": "ClaimGuard AI Backend",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "environment": "local"
 }
 ```
 
 ## What is intentionally not implemented yet
 
-- full claim lifecycle management beyond intake create/read/list
+- complicated lifecycle transition rules
 - full PostgreSQL schema
 - rule engine logic
 - denial risk scoring
