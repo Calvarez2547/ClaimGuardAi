@@ -1,5 +1,5 @@
 # Version
 
-- `v0.4.0` - Claim Intake Foundation
+- `v0.5.0` - Claim Lifecycle and Review Foundation
 
-This version establishes authenticated claim intake, claim ownership, secure claim retrieval, and current-user claim listing on top of the authentication foundation.
+This version adds owner-scoped claim status updates and review notes on top of the authenticated claim intake foundation.
