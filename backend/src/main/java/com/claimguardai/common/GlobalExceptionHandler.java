@@ -1,16 +1,17 @@
 package com.claimguardai.common;
 
 import com.claimguardai.auth.AuthenticationFailedException;
+import com.claimguardai.claims.ClaimNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -78,6 +79,19 @@ public class GlobalExceptionHandler {
                 request);
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(ClaimNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleClaimNotFoundException(
+            ClaimNotFoundException exception,
+            HttpServletRequest request) {
+
+        ErrorResponse response = errorResponseFactory.build(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                request);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(AccessDeniedException.class)

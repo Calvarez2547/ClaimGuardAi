@@ -1,5 +1,5 @@
 # Version
 
-- `v0.3.0` - Authentication and User Foundation
+- `v0.4.0` - Claim Intake Foundation
 
-This version establishes the user identity, password hashing, JWT authentication, protected current-user access, and local/test bootstrap support that future claim workflows will depend on.
+This version establishes authenticated claim intake, claim ownership, secure claim retrieval, and current-user claim listing on top of the authentication foundation.

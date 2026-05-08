@@ -4,11 +4,11 @@ This module contains the Spring Boot backend foundation for ClaimGuard AI, a hea
 
 ## Current phase
 
-- `v0.3.0` - Authentication and User Foundation
+- `v0.4.0` - Claim Intake Foundation
 
 ## Purpose
 
-This phase establishes the authentication and user identity foundation on top of the backend baseline. It adds a minimal user model, role support, password hashing, JWT-based authentication, current-user lookup, and local or test bootstrap support without adding product workflows yet.
+This phase establishes the first claim domain foundation on top of authentication. It adds authenticated claim intake, user-owned claim persistence, secure claim lookup by ID, and current-user claim listing without adding AI analysis, scoring, routing, dashboards, admin workflows, or frontend work.
 
 ## Tech stack
 
@@ -100,6 +100,49 @@ Current-user response shape:
 }
 ```
 
+## Claim intake endpoints
+
+All claim endpoints require a valid Bearer token.
+
+- `POST /api/claims`
+- `GET /api/claims/{claimId}`
+- `GET /api/claims`
+
+Example create-claim request:
+
+```json
+{
+  "claimNumber": "CLM-10001",
+  "patientControlNumber": "PCN-1001",
+  "payerName": "Acme Health Plan",
+  "providerName": "North Valley Clinic",
+  "serviceDate": "2026-05-01",
+  "billedAmount": 1250.75,
+  "claimNotes": "Initial clean claim intake."
+}
+```
+
+Example claim response:
+
+```json
+{
+  "id": 1,
+  "claimNumber": "CLM-10001",
+  "patientControlNumber": "PCN-1001",
+  "payerName": "Acme Health Plan",
+  "providerName": "North Valley Clinic",
+  "serviceDate": "2026-05-01",
+  "billedAmount": 1250.75,
+  "claimStatus": "RECEIVED",
+  "claimNotes": "Initial clean claim intake.",
+  "createdByUserId": 1,
+  "createdAt": "2026-05-08T00:00:00Z",
+  "updatedAt": "2026-05-08T00:00:00Z"
+}
+```
+
+Claim records are scoped to the authenticated user. Requests for another user's claim return the same structured not-found response as requests for a missing claim.
+
 ## Public health endpoint
 
 - `GET /api/health`
@@ -110,14 +153,14 @@ Example response:
 {
   "status": "UP",
   "application": "ClaimGuard AI Backend",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "environment": "local"
 }
 ```
 
 ## What is intentionally not implemented yet
 
-- claim CRUD APIs
+- full claim lifecycle management beyond intake create/read/list
 - full PostgreSQL schema
 - rule engine logic
 - denial risk scoring

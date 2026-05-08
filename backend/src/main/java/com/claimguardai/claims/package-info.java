@@ -1,4 +1,4 @@
 /**
- * Claim domain package reserved for future claim intake and retrieval features.
+ * Claim intake and retrieval domain package.
  */
 package com.claimguardai.claims;

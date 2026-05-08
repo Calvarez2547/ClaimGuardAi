@@ -13,9 +13,9 @@
 
     <groupId>com.claimguardai</groupId>
     <artifactId>claimguardai-backend</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <name>ClaimGuard AI Backend</name>
-    <description>Authentication and user foundation for the ClaimGuard AI portfolio project.</description>
+    <description>Claim intake foundation for the ClaimGuard AI portfolio project.</description>
 
     <properties>
         <java.version>21</java.version>
