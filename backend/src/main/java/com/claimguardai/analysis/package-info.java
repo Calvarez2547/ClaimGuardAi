@@ -1,4 +1,4 @@
 /**
- * Claim analysis foundation with deterministic risk rules and fallback summaries.
+ * Claim analysis endpoints and persistence backed by deterministic risk scoring.
  */
 package com.claimguardai.analysis;

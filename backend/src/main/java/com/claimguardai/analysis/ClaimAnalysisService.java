@@ -4,6 +4,9 @@ import com.claimguardai.auth.AuthenticatedUser;
 import com.claimguardai.claims.Claim;
 import com.claimguardai.claims.ClaimNotFoundException;
 import com.claimguardai.claims.ClaimRepository;
+import com.claimguardai.scoring.RiskFactorResult;
+import com.claimguardai.scoring.RiskScoringResult;
+import com.claimguardai.scoring.RiskScoringService;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,48 +16,46 @@ public class ClaimAnalysisService {
 
     private final ClaimRepository claimRepository;
     private final ClaimAnalysisRepository claimAnalysisRepository;
-    private final ClaimAnalysisRuleEvaluator ruleEvaluator;
-    private final ClaimRiskCalculator riskCalculator;
+    private final RiskScoringService riskScoringService;
     private final FallbackAnalysisSummaryGenerator summaryGenerator;
-    private final RecommendedActionGenerator recommendedActionGenerator;
 
     public ClaimAnalysisService(
             ClaimRepository claimRepository,
             ClaimAnalysisRepository claimAnalysisRepository,
-            ClaimAnalysisRuleEvaluator ruleEvaluator,
-            ClaimRiskCalculator riskCalculator,
-            FallbackAnalysisSummaryGenerator summaryGenerator,
-            RecommendedActionGenerator recommendedActionGenerator) {
+            RiskScoringService riskScoringService,
+            FallbackAnalysisSummaryGenerator summaryGenerator) {
         this.claimRepository = claimRepository;
         this.claimAnalysisRepository = claimAnalysisRepository;
-        this.ruleEvaluator = ruleEvaluator;
-        this.riskCalculator = riskCalculator;
+        this.riskScoringService = riskScoringService;
         this.summaryGenerator = summaryGenerator;
-        this.recommendedActionGenerator = recommendedActionGenerator;
     }
 
     @Transactional
     public ClaimAnalysisResponse analyzeClaim(Long claimId, AuthenticatedUser authenticatedUser) {
         Claim claim = getOwnedClaim(claimId, authenticatedUser);
-        List<RuleFinding> ruleFindings = ruleEvaluator.evaluate(claim);
-        RiskAssessment riskAssessment = riskCalculator.calculate(ruleFindings);
-        List<String> recommendedActions = recommendedActionGenerator.generate(ruleFindings, riskAssessment);
+        RiskScoringResult scoringResult = riskScoringService.scoreClaim(claim);
 
         ClaimAnalysis analysis = new ClaimAnalysis();
         analysis.setClaim(claim);
-        analysis.setRiskScore(riskAssessment.riskScore());
-        analysis.setRiskCategory(riskAssessment.riskCategory());
-        analysis.setPrimaryRiskReason(riskAssessment.primaryRiskReason());
-        analysis.setRecommendedActions(String.join("\n", recommendedActions));
-        analysis.setHumanReviewRequired(riskAssessment.humanReviewRequired());
+        analysis.setRiskScore(scoringResult.riskScore());
+        analysis.setRiskCategory(scoringResult.riskCategory());
+        analysis.setPrimaryRiskReason(scoringResult.primaryRiskReason());
+        analysis.setRecommendedActions(String.join("\n", scoringResult.recommendedActions()));
+        analysis.setHumanReviewRequired(scoringResult.humanReviewRequired());
         analysis.setFallbackUsed(true);
-        analysis.setAiSummary(summaryGenerator.generate(claim, riskAssessment, ruleFindings));
+        analysis.setAiSummary(summaryGenerator.generate(claim, scoringResult));
 
-        for (RuleFinding ruleFinding : ruleFindings) {
+        for (RiskFactorResult factor : scoringResult.factors()) {
             ClaimAnalysisFinding finding = new ClaimAnalysisFinding();
-            finding.setFindingCode(ruleFinding.findingCode());
-            finding.setDescription(ruleFinding.description());
-            finding.setPoints(ruleFinding.points());
+            finding.setFindingCode(factor.code());
+            finding.setDescription(factor.description());
+            finding.setPoints(factor.contribution());
+            finding.setFactorCategory(factor.category());
+            finding.setFactorLabel(factor.label());
+            finding.setSeverity(factor.severity());
+            finding.setWeight(factor.weight());
+            finding.setContribution(factor.contribution());
+            finding.setRecommendedAction(factor.recommendedAction());
             analysis.addFinding(finding);
         }
 
