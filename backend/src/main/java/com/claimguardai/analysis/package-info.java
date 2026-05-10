@@ -1,4 +1,4 @@
 /**
- * Analysis package reserved for future claim review orchestration features.
+ * Claim analysis foundation with deterministic risk rules and fallback summaries.
  */
 package com.claimguardai.analysis;

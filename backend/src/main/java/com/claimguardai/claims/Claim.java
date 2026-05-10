@@ -44,6 +44,12 @@ public class Claim {
     @Column(name = "billed_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal billedAmount;
 
+    @Column(name = "prior_auth_required", nullable = false)
+    private boolean priorAuthRequired;
+
+    @Column(name = "prior_auth_number", length = 80)
+    private String priorAuthNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "claim_status", nullable = false, length = 50)
     private ClaimStatus claimStatus = ClaimStatus.RECEIVED;
@@ -111,6 +117,22 @@ public class Claim {
 
     public void setBilledAmount(BigDecimal billedAmount) {
         this.billedAmount = billedAmount;
+    }
+
+    public boolean isPriorAuthRequired() {
+        return priorAuthRequired;
+    }
+
+    public void setPriorAuthRequired(boolean priorAuthRequired) {
+        this.priorAuthRequired = priorAuthRequired;
+    }
+
+    public String getPriorAuthNumber() {
+        return priorAuthNumber;
+    }
+
+    public void setPriorAuthNumber(String priorAuthNumber) {
+        this.priorAuthNumber = priorAuthNumber;
     }
 
     public ClaimStatus getClaimStatus() {
