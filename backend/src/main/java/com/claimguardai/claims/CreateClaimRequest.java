@@ -32,6 +32,11 @@ public record CreateClaimRequest(
         @Digits(integer = 10, fraction = 2, message = "Billed amount must have up to 10 integer digits and 2 decimal places.")
         BigDecimal billedAmount,
 
+        Boolean priorAuthRequired,
+
+        @Size(max = 80, message = "Prior authorization number must be 80 characters or fewer.")
+        String priorAuthNumber,
+
         @Size(max = 2000, message = "Claim notes must be 2000 characters or fewer.")
         String claimNotes) {
 }

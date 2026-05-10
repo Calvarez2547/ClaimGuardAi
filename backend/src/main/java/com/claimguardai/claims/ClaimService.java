@@ -35,6 +35,8 @@ public class ClaimService {
         claim.setProviderName(request.providerName().trim());
         claim.setServiceDate(request.serviceDate());
         claim.setBilledAmount(request.billedAmount());
+        claim.setPriorAuthRequired(Boolean.TRUE.equals(request.priorAuthRequired()));
+        claim.setPriorAuthNumber(trimToNull(request.priorAuthNumber()));
         claim.setClaimStatus(ClaimStatus.RECEIVED);
         claim.setClaimNotes(trimToNull(request.claimNotes()));
         claim.setCreatedBy(owner);

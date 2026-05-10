@@ -1,5 +1,5 @@
 # Version
 
-- `v0.5.0` - Claim Lifecycle and Review Foundation
+- `v0.6.0` - Claim AI Analysis Foundation
 
-This version adds owner-scoped claim status updates and review notes on top of the authenticated claim intake foundation.
+This version adds owner-scoped claim AI analysis records, deterministic risk findings, and a safe internal fallback summary on top of the claim lifecycle and review foundation.

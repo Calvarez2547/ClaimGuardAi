@@ -4,11 +4,11 @@ This module contains the Spring Boot backend foundation for ClaimGuard AI, a hea
 
 ## Current phase
 
-- `v0.5.0` - Claim Lifecycle and Review Foundation
+- `v0.6.0` - Claim AI Analysis Foundation
 
 ## Purpose
 
-This phase adds the basic owner-scoped claim lifecycle and review foundation on top of authenticated claim intake. It supports claim status updates and claim review notes without adding AI analysis, scoring, routing, dashboards, admin workflows, document upload, OCR, external integrations, or frontend work.
+This phase adds the first owner-scoped claim AI analysis foundation on top of authenticated claim lifecycle and review. It supports deterministic backend-owned risk findings, persistent analysis history, and a safe internal fallback summary without adding dashboard APIs, admin workflows, document upload, OCR, external integrations, real AI provider calls, or frontend work.
 
 ## Tech stack
 
@@ -121,6 +121,8 @@ Example create-claim request:
   "providerName": "North Valley Clinic",
   "serviceDate": "2026-05-01",
   "billedAmount": 1250.75,
+  "priorAuthRequired": false,
+  "priorAuthNumber": null,
   "claimNotes": "Initial clean claim intake."
 }
 ```
@@ -136,6 +138,8 @@ Example claim response:
   "providerName": "North Valley Clinic",
   "serviceDate": "2026-05-01",
   "billedAmount": 1250.75,
+  "priorAuthRequired": false,
+  "priorAuthNumber": null,
   "claimStatus": "RECEIVED",
   "claimNotes": "Initial clean claim intake.",
   "createdByUserId": 1,
@@ -174,6 +178,42 @@ Example review note response:
 }
 ```
 
+## Claim analysis endpoints
+
+All analysis endpoints require a valid Bearer token and are scoped to the authenticated claim owner.
+
+- `POST /api/claims/{claimId}/analyze`
+- `GET /api/claims/{claimId}/analysis/latest`
+- `GET /api/claims/{claimId}/analysis/history`
+
+Example analysis response:
+
+```json
+{
+  "analysisId": 1,
+  "claimId": 1,
+  "riskScore": 45,
+  "riskCategory": "MEDIUM",
+  "primaryRiskReason": "Prior authorization is required but no prior authorization number is recorded.",
+  "findings": [
+    {
+      "findingId": 1,
+      "findingCode": "PRIOR_AUTH_MISSING",
+      "description": "Prior authorization is required but no prior authorization number is recorded.",
+      "points": 45
+    }
+  ],
+  "aiSummary": "Administrative decision support only...",
+  "recommendedActions": [
+    "Verify prior authorization requirements and capture the authorization number before final disposition.",
+    "Route to a human reviewer before any operational decision is finalized."
+  ],
+  "humanReviewRequired": true,
+  "fallbackUsed": true,
+  "createdAt": "2026-05-09T00:00:00Z"
+}
+```
+
 ## Public health endpoint
 
 - `GET /api/health`
@@ -184,18 +224,18 @@ Example response:
 {
   "status": "UP",
   "application": "ClaimGuard AI Backend",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "environment": "local"
 }
 ```
 
 ## What is intentionally not implemented yet
 
-- complicated lifecycle transition rules
 - full PostgreSQL schema
-- rule engine logic
-- denial risk scoring
-- AI provider calls
+- real AI provider calls
+- production PHI handling
 - dashboard or reporting endpoints
+- document upload or OCR
+- payer, EHR, clearinghouse, or other external healthcare integrations
 - audit persistence implementation beyond structural foundations
 - admin user management workflows

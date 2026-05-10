@@ -27,7 +27,7 @@ class HealthControllerIntegrationTest {
                 .andExpect(header().exists("X-Correlation-Id"))
                 .andExpect(jsonPath("$.status").value("UP"))
                 .andExpect(jsonPath("$.application").value("ClaimGuard AI Backend"))
-                .andExpect(jsonPath("$.version").value("0.5.0"))
+                .andExpect(jsonPath("$.version").value("0.6.0"))
                 .andExpect(jsonPath("$.environment").value("local"));
     }
 }
