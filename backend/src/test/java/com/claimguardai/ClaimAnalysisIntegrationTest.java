@@ -92,7 +92,16 @@ class ClaimAnalysisIntegrationTest {
                 .andExpect(jsonPath("$.riskScore").value(0))
                 .andExpect(jsonPath("$.riskCategory").value("LOW"))
                 .andExpect(jsonPath("$.primaryRiskReason").value("No rule findings were identified."))
+                .andExpect(jsonPath("$.secondaryRiskReasons.length()").value(0))
                 .andExpect(jsonPath("$.findings.length()").value(0))
+                .andExpect(jsonPath("$.scoreBreakdown.baseScore").value(0))
+                .andExpect(jsonPath("$.scoreBreakdown.totalScore").value(0))
+                .andExpect(jsonPath("$.scoreBreakdown.cappedScore").value(0))
+                .andExpect(jsonPath("$.scoreBreakdown.riskCategory").value("LOW"))
+                .andExpect(jsonPath("$.scoreBreakdown.primaryRiskReason").value("No rule findings were identified."))
+                .andExpect(jsonPath("$.scoreBreakdown.secondaryRiskReasons.length()").value(0))
+                .andExpect(jsonPath("$.scoreBreakdown.factors.length()").value(0))
+                .andExpect(jsonPath("$.scoreBreakdown.recommendedActions[0]").value("Continue standard administrative processing."))
                 .andExpect(jsonPath("$.aiSummary").value(containsString("Administrative decision support only.")))
                 .andExpect(jsonPath("$.recommendedActions[0]").value("Continue standard administrative processing."))
                 .andExpect(jsonPath("$.humanReviewRequired").value(false))
@@ -210,9 +219,24 @@ class ClaimAnalysisIntegrationTest {
                 .andExpect(jsonPath("$.riskScore").value(45))
                 .andExpect(jsonPath("$.riskCategory").value("MEDIUM"))
                 .andExpect(jsonPath("$.primaryRiskReason").value("Prior authorization is required but no prior authorization number is recorded."))
+                .andExpect(jsonPath("$.secondaryRiskReasons.length()").value(0))
                 .andExpect(jsonPath("$.findings.length()").value(1))
                 .andExpect(jsonPath("$.findings[0].findingCode").value("PRIOR_AUTH_MISSING"))
                 .andExpect(jsonPath("$.findings[0].points").value(45))
+                .andExpect(jsonPath("$.findings[0].category").value("PRIOR_AUTHORIZATION"))
+                .andExpect(jsonPath("$.findings[0].label").value("Missing prior authorization"))
+                .andExpect(jsonPath("$.findings[0].severity").value("HIGH"))
+                .andExpect(jsonPath("$.findings[0].weight").value(45))
+                .andExpect(jsonPath("$.findings[0].triggered").value(true))
+                .andExpect(jsonPath("$.findings[0].contribution").value(45))
+                .andExpect(jsonPath("$.findings[0].recommendedAction").value("Verify whether prior authorization is required and attach or enter the authorization number before submission."))
+                .andExpect(jsonPath("$.scoreBreakdown.baseScore").value(0))
+                .andExpect(jsonPath("$.scoreBreakdown.totalScore").value(45))
+                .andExpect(jsonPath("$.scoreBreakdown.cappedScore").value(45))
+                .andExpect(jsonPath("$.scoreBreakdown.riskCategory").value("MEDIUM"))
+                .andExpect(jsonPath("$.scoreBreakdown.primaryRiskReason").value("Prior authorization is required but no prior authorization number is recorded."))
+                .andExpect(jsonPath("$.scoreBreakdown.factors[0].code").value("PRIOR_AUTH_MISSING"))
+                .andExpect(jsonPath("$.scoreBreakdown.recommendedActions[0]").value("Verify whether prior authorization is required and attach or enter the authorization number before submission."))
                 .andExpect(jsonPath("$.humanReviewRequired").value(true));
     }
 
@@ -229,6 +253,26 @@ class ClaimAnalysisIntegrationTest {
                 .andExpect(jsonPath("$.aiSummary").value(containsString("does not make final payer, legal, billing, coding, or clinical determinations")))
                 .andExpect(jsonPath("$.aiSummary").value(containsString("does not override the risk score, category, findings, recommended actions, or human review decision")))
                 .andExpect(jsonPath("$.recommendedActions.length()").value(2));
+    }
+
+    @Test
+    void latestAnalysisResponseIncludesStructuredRiskBreakdown() throws Exception {
+        String accessToken = authenticateAndExtractToken(SEEDED_USERNAME, SEEDED_PASSWORD);
+        Long claimId = createClaimAndExtractId(accessToken, fullyFlaggedClaimRequest(uniqueClaimNumber()));
+
+        analyzeClaimAndExtractId(accessToken, claimId);
+
+        mockMvc.perform(get("/api/claims/{claimId}/analysis/latest", claimId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.riskScore").value(100))
+                .andExpect(jsonPath("$.riskCategory").value("HIGH"))
+                .andExpect(jsonPath("$.secondaryRiskReasons.length()").value(3))
+                .andExpect(jsonPath("$.scoreBreakdown.totalScore").value(105))
+                .andExpect(jsonPath("$.scoreBreakdown.cappedScore").value(100))
+                .andExpect(jsonPath("$.scoreBreakdown.factors.length()").value(4))
+                .andExpect(jsonPath("$.scoreBreakdown.recommendedActions.length()").value(5))
+                .andExpect(jsonPath("$.humanReviewRequired").value(true));
     }
 
     private Long analyzeClaimAndExtractId(String accessToken, Long claimId) throws Exception {
@@ -295,6 +339,20 @@ class ClaimAnalysisIntegrationTest {
                   "billedAmount": 1250.75,
                   "priorAuthRequired": true,
                   "claimNotes": "Detailed administrative claim notes are available for review."
+                }
+                """.formatted(claimNumber);
+    }
+
+    private String fullyFlaggedClaimRequest(String claimNumber) {
+        return """
+                {
+                  "claimNumber": "%s",
+                  "payerName": "Acme Health Plan",
+                  "providerName": "North Valley Clinic",
+                  "serviceDate": "2026-05-01",
+                  "billedAmount": 15000.00,
+                  "priorAuthRequired": true,
+                  "claimNotes": "Too short"
                 }
                 """.formatted(claimNumber);
     }

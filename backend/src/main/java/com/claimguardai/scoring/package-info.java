@@ -1,4 +1,4 @@
 /**
- * Scoring package reserved for future denial risk scoring services.
+ * Deterministic backend-owned claim risk scoring foundation.
  */
 package com.claimguardai.scoring;

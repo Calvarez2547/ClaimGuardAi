@@ -1,16 +1,16 @@
 package com.claimguardai.analysis;
 
 import com.claimguardai.claims.Claim;
-import java.util.List;
+import com.claimguardai.scoring.RiskScoringResult;
 import org.springframework.stereotype.Component;
 
 @Component
 class FallbackAnalysisSummaryGenerator {
 
-    String generate(Claim claim, RiskAssessment riskAssessment, List<RuleFinding> findings) {
-        String findingSummary = findings.isEmpty()
+    String generate(Claim claim, RiskScoringResult scoringResult) {
+        String findingSummary = scoringResult.factors().isEmpty()
                 ? "No deterministic rule findings were identified."
-                : "The main administrative concern is: " + riskAssessment.primaryRiskReason();
+                : "The main administrative concern is: " + scoringResult.primaryRiskReason();
 
         return "Administrative decision support only. "
                 + "This fallback summary is generated from backend-owned deterministic rules for claim "
