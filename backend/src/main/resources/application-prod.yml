@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+
+logging:
+  level:
+    root: INFO
+    com.claimguardai: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+
+app:
+  runtime-environment: production
+  auth:
+    seed:
+      enabled: false
+  jwt:
+    secret: ${JWT_SECRET}
+  security:
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:}

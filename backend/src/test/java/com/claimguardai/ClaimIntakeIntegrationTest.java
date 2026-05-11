@@ -170,6 +170,55 @@ class ClaimIntakeIntegrationTest {
                 .andExpect(jsonPath("$.details").isArray());
     }
 
+    @Test
+    void validationRejectsFutureServiceDate() throws Exception {
+        String accessToken = authenticateAndExtractToken(SEEDED_USERNAME, SEEDED_PASSWORD);
+
+        mockMvc.perform(post("/api/claims")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "claimNumber": "%s",
+                                  "payerName": "Acme Health Plan",
+                                  "providerName": "North Valley Clinic",
+                                  "serviceDate": "2099-01-01",
+                                  "billedAmount": 1250.75
+                                }
+                                """.formatted(uniqueClaimNumber())))
+                .andExpect(status().isBadRequest())
+                .andExpect(header().exists("X-Correlation-Id"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed for request body."))
+                .andExpect(jsonPath("$.details[0].field").value("serviceDate"))
+                .andExpect(jsonPath("$.details[0].message").value("Service date cannot be in the future."));
+    }
+
+    @Test
+    void unknownRequestFieldsFailWithStructuredBadRequest() throws Exception {
+        String accessToken = authenticateAndExtractToken(SEEDED_USERNAME, SEEDED_PASSWORD);
+
+        mockMvc.perform(post("/api/claims")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "claimNumber": "%s",
+                                  "payerName": "Acme Health Plan",
+                                  "providerName": "North Valley Clinic",
+                                  "serviceDate": "2026-05-01",
+                                  "billedAmount": 1250.75,
+                                  "unexpectedField": "should-not-bind"
+                                }
+                                """.formatted(uniqueClaimNumber())))
+                .andExpect(status().isBadRequest())
+                .andExpect(header().exists("X-Correlation-Id"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Malformed JSON request body."))
+                .andExpect(jsonPath("$.details[0].field").value("unexpectedField"))
+                .andExpect(jsonPath("$.details[0].message").value("Unknown field is not allowed."));
+    }
+
     private Long createClaimAndExtractId(String accessToken, String claimNumber) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/claims")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
