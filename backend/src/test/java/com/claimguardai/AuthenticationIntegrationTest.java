@@ -99,6 +99,27 @@ class AuthenticationIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Malformed JSON request body."));
     }
 
+    @Test
+    void loginRejectsBlankCredentialsWithStructuredValidationErrors() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "username": "",
+                                  "password": ""
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(header().exists("X-Correlation-Id"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed for request body."))
+                .andExpect(jsonPath("$.details.length()").value(2))
+                .andExpect(jsonPath("$.details[0].field").value("password"))
+                .andExpect(jsonPath("$.details[0].message").value("Password is required."))
+                .andExpect(jsonPath("$.details[1].field").value("username"))
+                .andExpect(jsonPath("$.details[1].message").value("Username is required."));
+    }
+
     private String authenticateAndExtractToken() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

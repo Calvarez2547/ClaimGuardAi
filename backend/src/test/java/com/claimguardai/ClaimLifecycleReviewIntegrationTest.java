@@ -240,7 +240,9 @@ class ClaimLifecycleReviewIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(header().exists("X-Correlation-Id"))
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.message").value("Malformed JSON request body."));
+                .andExpect(jsonPath("$.message").value("Malformed JSON request body."))
+                .andExpect(jsonPath("$.details[0].field").value("status"))
+                .andExpect(jsonPath("$.details[0].message").value("Value must match the expected type or enum value."));
     }
 
     private void addReviewNote(String accessToken, Long claimId, String noteText) throws Exception {

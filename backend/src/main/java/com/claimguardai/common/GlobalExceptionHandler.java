@@ -2,8 +2,13 @@ package com.claimguardai.common;
 
 import com.claimguardai.auth.AuthenticationFailedException;
 import com.claimguardai.claims.ClaimNotFoundException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -15,6 +20,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     private final ApiErrorResponseFactory errorResponseFactory;
 
@@ -30,6 +37,7 @@ public class GlobalExceptionHandler {
         List<ApiErrorDetail> details = exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
+                .sorted((left, right) -> left.getField().compareToIgnoreCase(right.getField()))
                 .map(this::toDetail)
                 .toList();
 
@@ -60,10 +68,12 @@ public class GlobalExceptionHandler {
             HttpMessageNotReadableException exception,
             HttpServletRequest request) {
 
+        List<ApiErrorDetail> details = extractMessageDetails(exception);
         ErrorResponse response = errorResponseFactory.build(
                 HttpStatus.BAD_REQUEST,
                 "Malformed JSON request body.",
-                request);
+                request,
+                details);
 
         return ResponseEntity.badRequest().body(response);
     }
@@ -112,6 +122,7 @@ public class GlobalExceptionHandler {
             Exception exception,
             HttpServletRequest request) {
 
+        log.error("Unhandled exception for path {}", request.getRequestURI(), exception);
         ErrorResponse response = errorResponseFactory.build(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred.",
@@ -122,5 +133,27 @@ public class GlobalExceptionHandler {
 
     private ApiErrorDetail toDetail(FieldError fieldError) {
         return new ApiErrorDetail(fieldError.getField(), fieldError.getDefaultMessage());
+    }
+
+    private List<ApiErrorDetail> extractMessageDetails(HttpMessageNotReadableException exception) {
+        Throwable mostSpecificCause = exception.getMostSpecificCause();
+        if (mostSpecificCause instanceof UnrecognizedPropertyException propertyException) {
+            return List.of(new ApiErrorDetail(
+                    propertyException.getPropertyName(),
+                    "Unknown field is not allowed."));
+        }
+        if (mostSpecificCause instanceof InvalidFormatException invalidFormatException) {
+            String fieldPath = invalidFormatException.getPath().stream()
+                    .map(reference -> reference.getFieldName())
+                    .filter(java.util.Objects::nonNull)
+                    .collect(Collectors.joining("."));
+            if (!fieldPath.isBlank()) {
+                return List.of(new ApiErrorDetail(
+                        fieldPath,
+                        "Value must match the expected type or enum value."));
+            }
+        }
+
+        return List.of();
     }
 }

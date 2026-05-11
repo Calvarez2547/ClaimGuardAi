@@ -1,19 +1,28 @@
 package com.claimguardai.config;
 
 import com.claimguardai.users.UserRole;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 
 @ConfigurationProperties(prefix = "app")
+@Validated
 public class AppProperties {
 
     private String name = "ClaimGuard AI Backend";
-    private String version = "0.3.0";
+    private String version = "0.9.0";
     private String runtimeEnvironment = "default";
+    @Valid
     private final Ai ai = new Ai();
+    @Valid
     private final Auth auth = new Auth();
+    @Valid
     private final Jwt jwt = new Jwt();
+    @Valid
     private final Security security = new Security();
 
     public String getName() {
@@ -72,6 +81,7 @@ public class AppProperties {
     public static class Jwt {
 
         private String secret = "";
+        @Positive(message = "JWT expiration must be greater than zero minutes.")
         private long expirationMinutes = 60;
 
         public String getSecret() {
@@ -160,6 +170,7 @@ public class AppProperties {
 
     public static class Security {
 
+        @Valid
         private final Cors cors = new Cors();
 
         public Cors getCors() {
@@ -176,7 +187,16 @@ public class AppProperties {
         }
 
         public void setAllowedOrigins(List<String> allowedOrigins) {
-            this.allowedOrigins = allowedOrigins;
+            if (allowedOrigins == null) {
+                this.allowedOrigins = new ArrayList<>();
+                return;
+            }
+
+            this.allowedOrigins = allowedOrigins.stream()
+                    .filter(StringUtils::hasText)
+                    .map(String::trim)
+                    .distinct()
+                    .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         }
     }
 }

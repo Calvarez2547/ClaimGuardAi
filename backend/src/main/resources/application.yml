@@ -1,5 +1,11 @@
 server:
   port: ${SERVER_PORT:8080}
+  shutdown: graceful
+  forward-headers-strategy: framework
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
 
 spring:
   application:
@@ -7,9 +13,9 @@ spring:
   profiles:
     default: local
   datasource:
-    url: ${CLAIMGUARDAI_DB_URL:jdbc:postgresql://localhost:5432/claimguardai}
-    username: ${CLAIMGUARDAI_DB_USERNAME:}
-    password: ${CLAIMGUARDAI_DB_PASSWORD:}
+    url: ${SPRING_DATASOURCE_URL:${CLAIMGUARDAI_DB_URL:jdbc:postgresql://localhost:5432/claimguardai}}
+    username: ${SPRING_DATASOURCE_USERNAME:${CLAIMGUARDAI_DB_USERNAME:}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${CLAIMGUARDAI_DB_PASSWORD:}}
     driver-class-name: org.postgresql.Driver
   jpa:
     open-in-view: false
@@ -17,15 +23,26 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
+        jdbc:
+          time_zone: UTC
     show-sql: false
   flyway:
     enabled: true
     locations: classpath:db/migration
+    clean-disabled: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  mvc:
+    problemdetails:
+      enabled: false
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
 
 app:
   name: ClaimGuard AI Backend
-  version: 0.8.0
+  version: 0.9.0
   runtime-environment: ${CLAIMGUARDAI_RUNTIME_ENV:default}
   ai:
     api-key: ${AI_API_KEY:}
@@ -37,7 +54,11 @@ app:
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
   security:
     cors:
-      allowed-origins: ${CLAIMGUARDAI_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:${CLAIMGUARDAI_CORS_ALLOWED_ORIGINS:http://localhost:5173}}
+
+logging:
+  pattern:
+    level: "%5p [corr:%X{correlationId:-none}]"
 
 ---
 spring:
@@ -45,9 +66,9 @@ spring:
     activate:
       on-profile: local
   datasource:
-    url: ${CLAIMGUARDAI_LOCAL_DB_URL:jdbc:h2:mem:claimguardai;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
-    username: ${CLAIMGUARDAI_LOCAL_DB_USERNAME:sa}
-    password: ${CLAIMGUARDAI_LOCAL_DB_PASSWORD:}
+    url: ${CLAIMGUARDAI_LOCAL_DB_URL:${SPRING_DATASOURCE_URL:jdbc:h2:mem:claimguardai;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}}
+    username: ${CLAIMGUARDAI_LOCAL_DB_USERNAME:${SPRING_DATASOURCE_USERNAME:sa}}
+    password: ${CLAIMGUARDAI_LOCAL_DB_PASSWORD:${SPRING_DATASOURCE_PASSWORD:}}
     driver-class-name: ${CLAIMGUARDAI_LOCAL_DB_DRIVER:org.h2.Driver}
   jpa:
     database-platform: ${CLAIMGUARDAI_LOCAL_JPA_PLATFORM:org.hibernate.dialect.H2Dialect}
