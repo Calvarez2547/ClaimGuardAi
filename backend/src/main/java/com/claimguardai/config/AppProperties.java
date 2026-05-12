@@ -14,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
 public class AppProperties {
 
     private String name = "ClaimGuard AI Backend";
-    private String version = "0.9.0";
+    private String version = "1.0.0-rc";
     private String runtimeEnvironment = "default";
     @Valid
     private final Ai ai = new Ai();
