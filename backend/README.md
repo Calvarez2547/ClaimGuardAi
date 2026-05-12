@@ -2,22 +2,13 @@
 
 Spring Boot backend for the ClaimGuard AI portfolio project.
 
-## Current phase
+## Version
 
-- `v0.9.0` - Production Readiness, Security Hardening, and Deployment
+- `v1.0.0 release candidate`
 
-## Scope of this phase
+## Scope
 
-This phase hardens the existing authenticated API without adding frontend work, external healthcare integrations, OCR, uploads, admin dashboards, real AI provider calls, or new business workflows.
-
-Implemented in this phase:
-
-- explicit production profile configuration
-- environment-driven JWT secret requirements for production
-- safer production defaults for error handling and shutdown behavior
-- security response headers and frontend-ready CORS handling
-- deployment artifacts for containerized runs
-- updated tests for validation, CORS, headers, auth, and production config safety
+This backend demonstrates authenticated claim intake, review workflow support, deterministic analysis and scoring, dashboard summaries, and production-style security/configuration practices. It intentionally does not include a frontend, external healthcare integrations, real AI provider calls, or PHI-facing production claims.
 
 ## Tech stack
 
@@ -29,7 +20,7 @@ Implemented in this phase:
 - Spring Security
 - Flyway
 - PostgreSQL
-- H2 for local and test profiles
+- H2 for local and test
 - Maven
 
 ## Profiles
@@ -72,7 +63,7 @@ The production profile refuses startup when:
 - the local seed user is enabled
 - CORS uses `*`
 
-## Supported environment variables
+## Environment variables
 
 Required for `prod`:
 
@@ -87,8 +78,9 @@ Optional:
 - `SERVER_PORT` default `8080`
 - `CORS_ALLOWED_ORIGINS` comma-separated explicit origins
 - `JWT_EXPIRATION_MINUTES` default `60`
+- `CLAIMGUARDAI_RUNTIME_ENV`
 
-Backward-compatible non-prod datasource and local seed overrides are still supported:
+Local and test profile overrides remain available:
 
 - `CLAIMGUARDAI_DB_URL`
 - `CLAIMGUARDAI_DB_USERNAME`
@@ -108,7 +100,7 @@ Backward-compatible non-prod datasource and local seed overrides are still suppo
 Build from `backend/`:
 
 ```bash
-docker build -t claimguardai-backend:0.9.0 .
+docker build -t claimguardai-backend:1.0.0-rc .
 ```
 
 Run:
@@ -121,10 +113,10 @@ docker run --rm -p 8080:8080 \
   -e SPRING_DATASOURCE_USERNAME=claimguardai \
   -e SPRING_DATASOURCE_PASSWORD=change-me \
   -e CORS_ALLOWED_ORIGINS=http://localhost:5173 \
-  claimguardai-backend:0.9.0
+  claimguardai-backend:1.0.0-rc
 ```
 
-## API access
+## Endpoint summary
 
 Public:
 
@@ -145,43 +137,12 @@ Protected:
 - `GET /api/claims/{claimId}/analysis/history`
 - `GET /api/dashboard/summary`
 
-All protected endpoints remain owner-scoped.
+All protected endpoints are owner-scoped.
 
-## Quick API examples
+## Notes
 
-Health:
+- The health endpoint exposes application name, version, and runtime environment.
+- The local demo flow uses a deterministic fallback summary rather than a real LLM call.
+- The frontend directory remains reserved for future work.
 
-```bash
-curl http://localhost:8080/api/health
-```
-
-Login:
-
-```bash
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d "{\"username\":\"local.analyst\",\"password\":\"LocalPass123!\"}"
-```
-
-Current user:
-
-```bash
-curl http://localhost:8080/api/auth/me \
-  -H "Authorization: Bearer <jwt>"
-```
-
-Create claim:
-
-```bash
-curl -X POST http://localhost:8080/api/claims \
-  -H "Authorization: Bearer <jwt>" \
-  -H "Content-Type: application/json" \
-  -d "{\"claimNumber\":\"CLM-10001\",\"payerName\":\"Acme Health Plan\",\"providerName\":\"North Valley Clinic\",\"serviceDate\":\"2026-05-01\",\"billedAmount\":1250.75}"
-```
-
-## Security notes
-
-- JWT tokens are required for `/api/**` except the public health and login endpoints.
-- Correlation IDs are preserved through request and error responses via `X-Correlation-Id`.
-- Production responses do not expose stack traces.
-- The backend does not log request bodies, JWT tokens, Authorization headers, passwords, or password hashes.
+See the root [README.md](../README.md), [docs/api/README.md](../docs/api/README.md), and [docs/demo/DEMO_FLOW.md](../docs/demo/DEMO_FLOW.md).

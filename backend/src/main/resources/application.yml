@@ -42,7 +42,7 @@ spring:
 
 app:
   name: ClaimGuard AI Backend
-  version: 0.9.0
+  version: 1.0.0-rc
   runtime-environment: ${CLAIMGUARDAI_RUNTIME_ENV:default}
   ai:
     api-key: ${AI_API_KEY:}
