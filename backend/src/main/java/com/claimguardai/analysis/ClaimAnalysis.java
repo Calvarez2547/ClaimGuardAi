@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
@@ -47,6 +48,10 @@ public class ClaimAnalysis {
 
     @Column(name = "recommended_actions", nullable = false, length = 2000)
     private String recommendedActions;
+
+    @Lob
+    @Column(name = "ai_structured_output")
+    private String aiStructuredOutput;
 
     @Column(name = "human_review_required", nullable = false)
     private boolean humanReviewRequired;
@@ -111,6 +116,14 @@ public class ClaimAnalysis {
 
     public void setRecommendedActions(String recommendedActions) {
         this.recommendedActions = recommendedActions;
+    }
+
+    public String getAiStructuredOutput() {
+        return aiStructuredOutput;
+    }
+
+    public void setAiStructuredOutput(String aiStructuredOutput) {
+        this.aiStructuredOutput = aiStructuredOutput;
     }
 
     public boolean isHumanReviewRequired() {

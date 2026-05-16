@@ -54,7 +54,7 @@ mvn spring-boot:run
 Build:
 
 ```bash
-docker build -t claimguardai-backend:1.0.0-rc backend
+docker build -t claimguardai-backend:1.1.0 backend
 ```
 
 Run:
@@ -67,7 +67,7 @@ docker run --rm -p 8080:8080 \
   -e SPRING_DATASOURCE_USERNAME=claimguardai \
   -e SPRING_DATASOURCE_PASSWORD=change-me \
   -e CORS_ALLOWED_ORIGINS=http://localhost:5173 \
-  claimguardai-backend:1.0.0-rc
+claimguardai-backend:1.1.0
 ```
 
 ## Release-readiness notes

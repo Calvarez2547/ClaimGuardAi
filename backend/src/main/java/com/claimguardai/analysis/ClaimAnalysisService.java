@@ -17,23 +17,24 @@ public class ClaimAnalysisService {
     private final ClaimRepository claimRepository;
     private final ClaimAnalysisRepository claimAnalysisRepository;
     private final RiskScoringService riskScoringService;
-    private final FallbackAnalysisSummaryGenerator summaryGenerator;
+    private final ClaimAnalysisNarrativeService claimAnalysisNarrativeService;
 
     public ClaimAnalysisService(
             ClaimRepository claimRepository,
             ClaimAnalysisRepository claimAnalysisRepository,
             RiskScoringService riskScoringService,
-            FallbackAnalysisSummaryGenerator summaryGenerator) {
+            ClaimAnalysisNarrativeService claimAnalysisNarrativeService) {
         this.claimRepository = claimRepository;
         this.claimAnalysisRepository = claimAnalysisRepository;
         this.riskScoringService = riskScoringService;
-        this.summaryGenerator = summaryGenerator;
+        this.claimAnalysisNarrativeService = claimAnalysisNarrativeService;
     }
 
     @Transactional
     public ClaimAnalysisResponse analyzeClaim(Long claimId, AuthenticatedUser authenticatedUser) {
         Claim claim = getOwnedClaim(claimId, authenticatedUser);
         RiskScoringResult scoringResult = riskScoringService.scoreClaim(claim);
+        AiAnalysisResult aiAnalysisResult = claimAnalysisNarrativeService.buildNarrative(claim, scoringResult);
 
         ClaimAnalysis analysis = new ClaimAnalysis();
         analysis.setClaim(claim);
@@ -42,8 +43,9 @@ public class ClaimAnalysisService {
         analysis.setPrimaryRiskReason(scoringResult.primaryRiskReason());
         analysis.setRecommendedActions(String.join("\n", scoringResult.recommendedActions()));
         analysis.setHumanReviewRequired(scoringResult.humanReviewRequired());
-        analysis.setFallbackUsed(true);
-        analysis.setAiSummary(summaryGenerator.generate(claim, scoringResult));
+        analysis.setFallbackUsed(aiAnalysisResult.fallbackUsed());
+        analysis.setAiSummary(aiAnalysisResult.aiSummary());
+        analysis.setAiStructuredOutput(aiAnalysisResult.aiStructuredOutput());
 
         for (RiskFactorResult factor : scoringResult.factors()) {
             ClaimAnalysisFinding finding = new ClaimAnalysisFinding();

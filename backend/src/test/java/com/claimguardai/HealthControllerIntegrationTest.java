@@ -35,7 +35,7 @@ class HealthControllerIntegrationTest {
                 .andExpect(header().string("Permissions-Policy", "geolocation=(), microphone=(), camera=()"))
                 .andExpect(jsonPath("$.status").value("UP"))
                 .andExpect(jsonPath("$.application").value("ClaimGuard AI Backend"))
-                .andExpect(jsonPath("$.version").value("1.0.0-rc"))
+                .andExpect(jsonPath("$.version").value("1.1.0"))
                 .andExpect(jsonPath("$.environment").value("local"));
     }
 

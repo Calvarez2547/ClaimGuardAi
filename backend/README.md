@@ -4,11 +4,11 @@ Spring Boot backend for the ClaimGuard AI portfolio project.
 
 ## Version
 
-- `v1.0.0 release candidate`
+- `v1.1.0`
 
 ## Scope
 
-This backend demonstrates authenticated claim intake, review workflow support, deterministic analysis and scoring, dashboard summaries, and production-style security/configuration practices. It intentionally does not include a frontend, external healthcare integrations, real AI provider calls, or PHI-facing production claims.
+This backend demonstrates authenticated claim intake, review workflow support, deterministic scoring, AI-assisted claim analysis summaries, dashboard summaries, and production-style security/configuration practices. It intentionally does not include a frontend, external payer/EHR/clearinghouse integrations, or PHI-facing production claims.
 
 ## Tech stack
 
@@ -41,6 +41,14 @@ Default local credentials:
 
 - username: `local.analyst`
 - password: `LocalPass123!`
+
+Optional local AI provider variables:
+
+- `AI_ENABLED=false` by default
+- `AI_PROVIDER=OPENAI`
+- `AI_API_KEY` required only when `AI_ENABLED=true`
+- `AI_MODEL=gpt-4o-mini`
+- `AI_TIMEOUT_SECONDS=30`
 
 ## Production-style run
 
@@ -79,6 +87,11 @@ Optional:
 - `CORS_ALLOWED_ORIGINS` comma-separated explicit origins
 - `JWT_EXPIRATION_MINUTES` default `60`
 - `CLAIMGUARDAI_RUNTIME_ENV`
+- `AI_ENABLED`
+- `AI_PROVIDER`
+- `AI_API_KEY`
+- `AI_MODEL`
+- `AI_TIMEOUT_SECONDS`
 
 Local and test profile overrides remain available:
 
@@ -100,7 +113,7 @@ Local and test profile overrides remain available:
 Build from `backend/`:
 
 ```bash
-docker build -t claimguardai-backend:1.0.0-rc .
+docker build -t claimguardai-backend:1.1.0 .
 ```
 
 Run:
@@ -113,7 +126,7 @@ docker run --rm -p 8080:8080 \
   -e SPRING_DATASOURCE_USERNAME=claimguardai \
   -e SPRING_DATASOURCE_PASSWORD=change-me \
   -e CORS_ALLOWED_ORIGINS=http://localhost:5173 \
-  claimguardai-backend:1.0.0-rc
+  claimguardai-backend:1.1.0
 ```
 
 ## Endpoint summary
@@ -142,7 +155,9 @@ All protected endpoints are owner-scoped.
 ## Notes
 
 - The health endpoint exposes application name, version, and runtime environment.
-- The local demo flow uses a deterministic fallback summary rather than a real LLM call.
+- Deterministic risk scoring remains the source of truth even when AI is enabled.
+- If AI is disabled or the provider call fails, analysis falls back safely to the deterministic backend summary.
+- This project is not presented as HIPAA compliant, production-ready for PHI, or integrated with a real payer, EHR, or clearinghouse.
 - The frontend directory remains reserved for future work.
 
 See the root [README.md](../README.md), [docs/api/README.md](../docs/api/README.md), and [docs/demo/DEMO_FLOW.md](../docs/demo/DEMO_FLOW.md).

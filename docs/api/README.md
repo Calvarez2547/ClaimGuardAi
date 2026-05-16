@@ -1,6 +1,6 @@
 # API Guide
 
-ClaimGuard AI exposes a small backend-only REST API for authenticated claim review workflows. All examples below reflect the current codebase on the `v1.0.0 release candidate` branch state.
+ClaimGuard AI exposes a small backend-only REST API for authenticated claim review workflows. All examples below reflect the current codebase at `v1.1.0`.
 
 ## Base URL
 
@@ -39,7 +39,7 @@ Example response:
 {
   "status": "UP",
   "application": "ClaimGuard AI Backend",
-  "version": "1.0.0-rc",
+  "version": "1.1.0",
   "environment": "local"
 }
 ```
@@ -275,7 +275,15 @@ curl.exe http://localhost:8080/api/claims/1/review-notes `
 
 ## AI analysis endpoints
 
-This project does not call a real AI provider. Analysis is deterministic and backend-owned. The response includes an `aiSummary`, but the current implementation uses a safe fallback summary and explicitly exposes whether fallback logic was used.
+Deterministic backend scoring remains the source of truth. When AI is enabled and configured, the backend calls OpenAI to generate reviewer-support narrative output. When AI is disabled or a provider call fails, the backend falls back safely to deterministic summary generation and exposes that behavior through `fallbackUsed`.
+
+AI runtime variables:
+
+- `AI_ENABLED`
+- `AI_PROVIDER`
+- `AI_API_KEY`
+- `AI_MODEL`
+- `AI_TIMEOUT_SECONDS`
 
 ### `POST /api/claims/{claimId}/analyze`
 
@@ -339,16 +347,23 @@ Example response:
       "Route to a human reviewer before any operational decision is finalized."
     ]
   },
-  "aiSummary": "Administrative decision support only. The fallback summary is generated from backend-owned deterministic rules.",
+  "aiSummary": "AI-assisted reviewer support only. The claim should be reviewed for missing prior authorization details.\n\nRisk explanation: The deterministic score is elevated because prior authorization is required but not recorded.\n\nDocumentation concerns:\n- Prior authorization details are missing from the claim record.\n\nSuggested reviewer actions:\n- Confirm the prior authorization number with the ordering workflow.\n\nReview priority: HIGH\n\nDisclaimer: This is AI-assisted review support and not a final payer decision.",
   "recommendedActions": [
     "Verify whether prior authorization is required and attach or enter the authorization number before submission.",
     "Route to a human reviewer before any operational decision is finalized."
   ],
   "humanReviewRequired": true,
-  "fallbackUsed": true,
+  "fallbackUsed": false,
   "createdAt": "2026-05-11T18:36:00Z"
 }
 ```
+
+Behavior notes:
+
+- deterministic `riskScore`, `riskCategory`, `findings`, `scoreBreakdown`, and `humanReviewRequired` stay backend-owned
+- `aiSummary` can be provider-backed or fallback-backed
+- `recommendedActions` in the API response remain deterministic backend actions
+- `fallbackUsed=true` means the provider was disabled or fallback logic was used after a provider failure
 
 ### `GET /api/claims/{claimId}/analysis/latest`
 

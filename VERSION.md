@@ -1,9 +1,9 @@
 # Version
 
-- `v1.0.0 release candidate`
-- Phase: `Final Polish, Documentation, Demo Flow, and Portfolio Release`
-- Tag status: no `v1.0.0` git tag has been created by this change
+- `v1.1.0`
+- Phase: `Real AI Provider Integration`
+- Tag status: no `v1.1.0` git tag has been created by this change
 
-## Release-candidate summary
+## Version summary
 
-ClaimGuard AI is now positioned as a demo-ready, portfolio-grade backend project. The application surface is stable for review, documentation has been aligned with the actual codebase, and the project includes a repeatable local demo flow, API usage examples, and release notes.
+ClaimGuard AI now supports optional real OpenAI provider integration for AI-assisted reviewer summaries while preserving deterministic backend scoring as the source of truth. The endpoint surface remains stable, fallback behavior remains available, and local setup/docs are updated for safe non-production experimentation.
