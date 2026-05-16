@@ -16,9 +16,9 @@ The result is a portfolio-grade backend that is easy to inspect on GitHub, easy 
 
 ## Current status
 
-- Current version: `v1.0.0 release candidate`
-- Current phase: `Phase 10 - Final Polish, Documentation, Demo Flow, and Portfolio Release`
-- Backend baseline through Phase 9 is complete on `main`
+- Current version: `v1.1.0`
+- Current phase: `Phase 11 - Real AI Provider Integration`
+- Backend baseline through `v1.0.0` is complete on `main`
 - This repository is backend-first; the frontend remains future work
 
 ## What is implemented
@@ -29,6 +29,7 @@ The result is a portfolio-grade backend that is easy to inspect on GitHub, easy 
 - owner-scoped claim status updates
 - owner-scoped review note creation and retrieval
 - deterministic claim analysis with persisted history
+- optional OpenAI-backed claim review narrative generation with safe fallback
 - structured risk scoring breakdowns and recommended actions
 - owner-scoped dashboard summary metrics
 - health endpoint, structured errors, and correlation IDs
@@ -38,8 +39,7 @@ The result is a portfolio-grade backend that is easy to inspect on GitHub, easy 
 
 - no frontend application in this phase
 - no OCR, uploads, email, payments, payer connectivity, EHR connectivity, or clearinghouse connectivity
-- no real AI provider integration
-- no real PHI workflow or HIPAA compliance claim
+- no production-ready PHI workflow or HIPAA compliance claim
 - no admin dashboard or global cross-tenant reporting
 
 ## Backend stack
@@ -64,9 +64,10 @@ The result is a portfolio-grade backend that is easy to inspect on GitHub, easy 
 - correlation ID propagation through request handling and errors via `X-Correlation-Id`
 - hardened response headers and environment-based CORS configuration
 - production profile startup validation for JWT secret strength and explicit CORS origins
+- AI provider configuration validation when AI is enabled
 - local seeded user disabled by default in `prod`
 
-This is a production-style security baseline for a portfolio backend. It is not presented as certified HIPAA compliance or production PHI handling.
+This is a production-style security baseline for a portfolio backend. It is not presented as certified HIPAA compliance, production PHI handling, or a real healthcare system integration.
 
 ## API summary
 
@@ -133,6 +134,7 @@ The current suite covers:
 - claim intake and owner scoping
 - claim lifecycle review endpoints
 - claim analysis and persisted history
+- AI provider success, failure fallback, and configuration validation
 - dashboard summary behavior
 - health endpoint and hardened headers
 - production configuration validation
@@ -146,6 +148,11 @@ For `local`:
 
 - `JWT_SECRET` optional because a local default exists
 - `SERVER_PORT` optional, default `8080`
+- `AI_ENABLED` optional, default `false`
+- `AI_PROVIDER` optional, default `OPENAI`
+- `AI_API_KEY` required only when `AI_ENABLED=true`
+- `AI_MODEL` optional, default `gpt-4o-mini`
+- `AI_TIMEOUT_SECONDS` optional, default `30`
 
 For `prod`:
 
@@ -188,9 +195,11 @@ ClaimGuard AI is best reviewed as a backend engineering project. The strongest s
 - clean Spring Boot module organization
 - authenticated and owner-scoped REST endpoints
 - deterministic scoring logic with test coverage
+- optional real OpenAI provider integration with explicit fallback behavior
 - structured error handling and request correlation
 - production-style profile validation and deployment posture
 - honest boundaries around what is simulated versus truly integrated
+- explicit non-claims around HIPAA, PHI readiness, payer connectivity, and clinical/legal decision making
 
 ## Roadmap / phase history
 
@@ -204,5 +213,6 @@ ClaimGuard AI is best reviewed as a backend engineering project. The strongest s
 - `v0.8.0`: dashboard summary foundation
 - `v0.9.0`: production readiness, security hardening, and deployment
 - `v1.0.0 release candidate`: final polish, demo flow, release docs, and portfolio readiness
+- `v1.1.0`: real OpenAI provider integration with deterministic scoring retained as source of truth
 
-Release notes: [docs/releases/v1.0.0.md](docs/releases/v1.0.0.md)
+Release notes: [docs/releases/v1.1.0.md](docs/releases/v1.1.0.md)

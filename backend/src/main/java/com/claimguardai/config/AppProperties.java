@@ -14,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
 public class AppProperties {
 
     private String name = "ClaimGuard AI Backend";
-    private String version = "1.0.0-rc";
+    private String version = "1.1.0";
     private String runtimeEnvironment = "default";
     @Valid
     private final Ai ai = new Ai();
@@ -67,7 +67,28 @@ public class AppProperties {
 
     public static class Ai {
 
+        private boolean enabled = false;
+        private String provider = "OPENAI";
         private String apiKey = "";
+        private String model = "gpt-4o-mini";
+        @Positive(message = "AI timeout seconds must be greater than zero.")
+        private long timeoutSeconds = 30;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getProvider() {
+            return provider;
+        }
+
+        public void setProvider(String provider) {
+            this.provider = provider;
+        }
 
         public String getApiKey() {
             return apiKey;
@@ -75,6 +96,22 @@ public class AppProperties {
 
         public void setApiKey(String apiKey) {
             this.apiKey = apiKey;
+        }
+
+        public String getModel() {
+            return model;
+        }
+
+        public void setModel(String model) {
+            this.model = model;
+        }
+
+        public long getTimeoutSeconds() {
+            return timeoutSeconds;
+        }
+
+        public void setTimeoutSeconds(long timeoutSeconds) {
+            this.timeoutSeconds = timeoutSeconds;
         }
     }
 

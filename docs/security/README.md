@@ -13,6 +13,7 @@ ClaimGuard AI uses a production-style security baseline that fits a backend port
 - hardened response headers
 - explicit CORS configuration with production guardrails
 - startup validation for production profile secrets and seed-user safety
+- startup validation for AI provider configuration when AI is enabled
 
 ## Protected resources
 
@@ -35,7 +36,9 @@ The user-visible behavior is deliberate: when a user requests another user’s c
 - no EHR or clearinghouse connectivity
 - no admin or superuser workflow surface in this phase
 - no claim of certified HIPAA compliance
+- no claim of production readiness for real PHI handling
+- AI output is reviewer support only and is not a medical, legal, clinical, or final payer decision
 
 ## Production notes
 
-The production profile should be treated as a secure starting point, not a finished platform. Real deployment work would still need managed secrets, audit logging strategy, monitoring, incident response, and operational controls around infrastructure and data handling.
+The production profile should be treated as a secure starting point, not a finished platform. Real deployment work would still need managed secrets, audit logging strategy, monitoring, incident response, operational controls around infrastructure and data handling, and a healthcare-grade compliance program.

@@ -13,9 +13,9 @@
 
     <groupId>com.claimguardai</groupId>
     <artifactId>claimguardai-backend</artifactId>
-    <version>1.0.0-rc</version>
+    <version>1.1.0</version>
     <name>ClaimGuard AI Backend</name>
-    <description>Portfolio-ready ClaimGuard AI backend with authenticated claim workflows, deterministic analysis, and production-style security.</description>
+    <description>Portfolio-ready ClaimGuard AI backend with authenticated claim workflows, deterministic scoring, AI-assisted claim analysis, and production-style security.</description>
 
     <properties>
         <java.version>21</java.version>
@@ -50,6 +50,11 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.openai</groupId>
+            <artifactId>openai-java</artifactId>
+            <version>4.36.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

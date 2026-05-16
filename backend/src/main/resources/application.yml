@@ -42,10 +42,14 @@ spring:
 
 app:
   name: ClaimGuard AI Backend
-  version: 1.0.0-rc
+  version: 1.1.0
   runtime-environment: ${CLAIMGUARDAI_RUNTIME_ENV:default}
   ai:
+    enabled: ${AI_ENABLED:false}
+    provider: ${AI_PROVIDER:OPENAI}
     api-key: ${AI_API_KEY:}
+    model: ${AI_MODEL:gpt-4o-mini}
+    timeout-seconds: ${AI_TIMEOUT_SECONDS:30}
   auth:
     seed:
       enabled: false

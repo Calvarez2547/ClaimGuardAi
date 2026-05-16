@@ -13,6 +13,7 @@ Demonstrate that the backend can:
 - create and retrieve owner-scoped claims
 - record review workflow notes
 - run deterministic analysis with a structured risk breakdown
+- optionally run OpenAI-backed reviewer summary generation
 - aggregate data in a dashboard summary
 
 ## Prerequisites
@@ -33,6 +34,11 @@ Expected local demo credentials:
 
 - username: `local.analyst`
 - password: `LocalPass123!`
+
+Default local AI behavior:
+
+- `AI_ENABLED=false`
+- analysis still works through deterministic fallback behavior
 
 ## 1. Verify health
 
@@ -162,9 +168,10 @@ curl.exe -X POST http://localhost:8080/api/claims/<claimId>/analyze `
 
 What to call out:
 
-- analysis is deterministic
-- current implementation uses a fallback summary, not a live AI provider
-- response includes score, category, findings, recommended actions, and human-review flag
+- deterministic backend scoring is the source of truth
+- by default local startup uses deterministic fallback summary behavior
+- if OpenAI is enabled, `aiSummary` becomes provider-backed while the score, category, findings, and human-review flag remain backend-owned
+- `fallbackUsed` makes the behavior explicit
 
 ## 10. Retrieve latest analysis
 
@@ -219,6 +226,26 @@ Then run `/analyze` on that claim and point out:
 - `humanReviewRequired: true`
 - dashboard summary changes
 
+## Optional: enable OpenAI locally
+
+Restart the backend with:
+
+```powershell
+$env:AI_ENABLED="true"
+$env:AI_PROVIDER="OPENAI"
+$env:AI_API_KEY="replace-with-a-real-openai-api-key"
+$env:AI_MODEL="gpt-4o-mini"
+$env:AI_TIMEOUT_SECONDS="30"
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+What to call out:
+
+- the endpoint contract does not change
+- deterministic scoring still controls the analysis record
+- `aiSummary` becomes provider-backed when the OpenAI call succeeds
+- fallback remains available if the provider call fails
+
 ## Owner-scoping note
 
 There is no public registration or admin user-management API in this scoped backend, so a live two-user demo is not the primary path. Owner scoping is already covered by integration tests:
@@ -235,5 +262,6 @@ If you need a live two-user walkthrough, create a second user record through the
 - the project is backend-first and runnable
 - auth and owner scoping are enforced
 - the claim workflow is coherent end to end
-- scoring and analysis are deterministic and inspectable
+- deterministic scoring is inspectable and remains authoritative
+- AI output is reviewer support only
 - the backend is polished enough for portfolio review without overstating real-world integration maturity
