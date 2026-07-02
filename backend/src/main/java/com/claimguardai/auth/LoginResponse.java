@@ -5,5 +5,6 @@ import java.time.Instant;
 public record LoginResponse(
         String accessToken,
         String tokenType,
-        Instant expiresAt) {
+        Instant expiresAt,
+        String refreshToken) {
 }

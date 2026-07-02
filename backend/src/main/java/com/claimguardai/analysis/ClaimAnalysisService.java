@@ -1,5 +1,7 @@
 package com.claimguardai.analysis;
 
+import com.claimguardai.audit.AuditEventType;
+import com.claimguardai.audit.AuditService;
 import com.claimguardai.auth.AuthenticatedUser;
 import com.claimguardai.claims.Claim;
 import com.claimguardai.claims.ClaimNotFoundException;
@@ -18,16 +20,19 @@ public class ClaimAnalysisService {
     private final ClaimAnalysisRepository claimAnalysisRepository;
     private final RiskScoringService riskScoringService;
     private final ClaimAnalysisNarrativeService claimAnalysisNarrativeService;
+    private final AuditService auditService;
 
     public ClaimAnalysisService(
             ClaimRepository claimRepository,
             ClaimAnalysisRepository claimAnalysisRepository,
             RiskScoringService riskScoringService,
-            ClaimAnalysisNarrativeService claimAnalysisNarrativeService) {
+            ClaimAnalysisNarrativeService claimAnalysisNarrativeService,
+            AuditService auditService) {
         this.claimRepository = claimRepository;
         this.claimAnalysisRepository = claimAnalysisRepository;
         this.riskScoringService = riskScoringService;
         this.claimAnalysisNarrativeService = claimAnalysisNarrativeService;
+        this.auditService = auditService;
     }
 
     @Transactional
@@ -61,7 +66,12 @@ public class ClaimAnalysisService {
             analysis.addFinding(finding);
         }
 
-        return ClaimAnalysisResponse.from(claimAnalysisRepository.save(analysis));
+        ClaimAnalysisResponse saved = ClaimAnalysisResponse.from(claimAnalysisRepository.save(analysis));
+        auditService.log(AuditEventType.ANALYSIS_RUN, authenticatedUser.getId(),
+                "Claim", String.valueOf(claimId), null, null,
+                "Analysis run for claim #" + claim.getClaimNumber()
+                + " — risk score: " + scoringResult.riskScore());
+        return saved;
     }
 
     @Transactional(readOnly = true)

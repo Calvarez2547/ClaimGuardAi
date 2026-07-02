@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #06264a;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #d9ebff;
+      user-select: none;
+    }
+    svg { margin-bottom: 20px; }
+    h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
+    p { font-size: 13px; color: #7fb8e0; margin-top: 8px; }
+    .bar-track {
+      margin-top: 28px;
+      width: 200px;
+      height: 3px;
+      background: #1a3a5c;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 40%;
+      background: #19c3ff;
+      border-radius: 99px;
+      animation: slide 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes slide {
+      from { margin-left: 0; }
+      to   { margin-left: 60%; }
+    }
+  </style>
+</head>
+<body>
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+       stroke="#19c3ff" stroke-width="1.5"
+       stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+  <h1>ClaimGuard AI</h1>
+  <p>Starting backend…</p>
+  <div class="bar-track"><div class="bar-fill"></div></div>
+</body>
+</html>

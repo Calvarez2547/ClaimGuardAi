@@ -18,8 +18,8 @@ The result is a portfolio-grade backend that is easy to inspect on GitHub, easy 
 
 - Current version: `v1.1.0`
 - Current phase: `Phase 11 - Real AI Provider Integration`
-- Backend baseline through `v1.0.0` is complete on `main`
-- This repository is backend-first; the frontend remains future work
+- Backend baseline through `v1.1.0` is complete
+- The `frontend/` directory now contains a React/TypeScript MVP for local portfolio demonstration
 
 ## What is implemented
 
@@ -37,7 +37,7 @@ The result is a portfolio-grade backend that is easy to inspect on GitHub, easy 
 
 ## What is not implemented
 
-- no frontend application in this phase
+- no production frontend deployment in this phase
 - no OCR, uploads, email, payments, payer connectivity, EHR connectivity, or clearinghouse connectivity
 - no production-ready PHI workflow or HIPAA compliance claim
 - no admin dashboard or global cross-tenant reporting
@@ -98,7 +98,7 @@ Detailed request and response examples live in [docs/api/README.md](docs/api/REA
 - `docs/` supporting project documentation
 - `database/` database reference folders
 - `scripts/` helper scripts
-- `frontend/` reserved for future frontend work
+- `frontend/` React/TypeScript local MVP
 
 ## Local run
 
@@ -106,6 +106,7 @@ Prerequisites:
 
 - Java 21
 - Maven 3.9+
+- Node.js and npm for the frontend
 
 From [`backend/`](backend/):
 
@@ -119,6 +120,19 @@ The default local profile uses in-memory H2 and seeds one demo user:
 - password: `LocalPass123!`
 
 The API starts on `http://localhost:8080` by default.
+
+From [`frontend/`](frontend/):
+
+```bash
+npm install
+npm run dev
+```
+
+The frontend starts on `http://localhost:5173` and expects:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8080
+```
 
 ## Tests
 
@@ -175,16 +189,15 @@ More setup detail is in [docs/setup/LOCAL_SETUP.md](docs/setup/LOCAL_SETUP.md) a
 The cleanest recruiter-friendly walkthrough is:
 
 1. start the backend with the `local` profile
-2. hit `GET /api/health`
-3. log in with the seeded local user
-4. call `GET /api/auth/me`
-5. create a claim
-6. list claims and fetch claim details
-7. add and list review notes
-8. run claim analysis
-9. fetch latest analysis and analysis history
-10. fetch dashboard summary
-11. show a protected endpoint without a token
+2. start the frontend with `npm run dev`
+3. open `http://localhost:5173`
+4. log in with the seeded local user
+5. view the dashboard summary
+6. create a fake/demo claim
+7. list claims and fetch claim details
+8. update status, add notes, and run claim analysis
+9. view latest analysis and analysis history
+10. show logout and protected route behavior
 
 Use [docs/demo/DEMO_FLOW.md](docs/demo/DEMO_FLOW.md) for the exact commands.
 
