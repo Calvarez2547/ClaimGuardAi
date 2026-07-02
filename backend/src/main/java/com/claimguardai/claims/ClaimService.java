@@ -1,5 +1,7 @@
 package com.claimguardai.claims;
 
+import com.claimguardai.audit.AuditEventType;
+import com.claimguardai.audit.AuditService;
 import com.claimguardai.auth.AuthenticatedUser;
 import com.claimguardai.users.UserAccount;
 import com.claimguardai.users.UserAccountRepository;
@@ -13,14 +15,17 @@ public class ClaimService {
     private final ClaimRepository claimRepository;
     private final ClaimReviewNoteRepository claimReviewNoteRepository;
     private final UserAccountRepository userAccountRepository;
+    private final AuditService auditService;
 
     public ClaimService(
             ClaimRepository claimRepository,
             ClaimReviewNoteRepository claimReviewNoteRepository,
-            UserAccountRepository userAccountRepository) {
+            UserAccountRepository userAccountRepository,
+            AuditService auditService) {
         this.claimRepository = claimRepository;
         this.claimReviewNoteRepository = claimReviewNoteRepository;
         this.userAccountRepository = userAccountRepository;
+        this.auditService = auditService;
     }
 
     @Transactional
@@ -41,7 +46,11 @@ public class ClaimService {
         claim.setClaimNotes(trimToNull(request.claimNotes()));
         claim.setCreatedBy(owner);
 
-        return ClaimResponse.from(claimRepository.save(claim));
+        ClaimResponse saved = ClaimResponse.from(claimRepository.save(claim));
+        auditService.log(AuditEventType.CLAIM_CREATED, authenticatedUser.getId(),
+                "Claim", String.valueOf(saved.id()), null, null,
+                "Created claim #" + saved.claimNumber());
+        return saved;
     }
 
     @Transactional(readOnly = true)
@@ -65,7 +74,11 @@ public class ClaimService {
 
         Claim claim = getOwnedClaim(claimId, authenticatedUser);
         claim.setClaimStatus(request.status());
-        return ClaimResponse.from(claimRepository.save(claim));
+        ClaimResponse saved = ClaimResponse.from(claimRepository.save(claim));
+        auditService.log(AuditEventType.CLAIM_STATUS_UPDATED, authenticatedUser.getId(),
+                "Claim", String.valueOf(claimId), null, null,
+                "Status updated to " + request.status() + " for claim #" + claim.getClaimNumber());
+        return saved;
     }
 
     @Transactional
@@ -83,7 +96,11 @@ public class ClaimService {
         note.setAuthor(author);
         note.setNoteText(request.noteText().trim());
 
-        return ClaimReviewNoteResponse.from(claimReviewNoteRepository.save(note));
+        ClaimReviewNoteResponse saved = ClaimReviewNoteResponse.from(claimReviewNoteRepository.save(note));
+        auditService.log(AuditEventType.REVIEW_NOTE_ADDED, authenticatedUser.getId(),
+                "Claim", String.valueOf(claimId), null, null,
+                "Review note added to claim #" + claim.getClaimNumber());
+        return saved;
     }
 
     @Transactional(readOnly = true)

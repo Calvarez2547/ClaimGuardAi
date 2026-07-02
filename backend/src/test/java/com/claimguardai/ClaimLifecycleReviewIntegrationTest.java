@@ -68,7 +68,7 @@ class ClaimLifecycleReviewIntegrationTest {
         otherUser.setEmail("other.lifecycle.analyst@claimguardai.local");
         otherUser.setPasswordHash(passwordEncoder.encode(OTHER_PASSWORD));
         otherUser.setEnabled(true);
-        otherUser.setRoles(new LinkedHashSet<>(Set.of(UserRole.USER)));
+        otherUser.setRoles(new LinkedHashSet<>(Set.of(UserRole.REVENUE_CYCLE_ANALYST)));
         userAccountRepository.save(otherUser);
     }
 

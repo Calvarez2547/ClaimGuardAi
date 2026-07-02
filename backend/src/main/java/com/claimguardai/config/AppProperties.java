@@ -14,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
 public class AppProperties {
 
     private String name = "ClaimGuard AI Backend";
-    private String version = "1.1.0";
+    private String version = "1.2.0";
     private String runtimeEnvironment = "default";
     @Valid
     private final Ai ai = new Ai();
@@ -154,7 +154,7 @@ public class AppProperties {
         private String email = "";
         private String password = "";
         private boolean accountEnabled = true;
-        private List<UserRole> roles = new ArrayList<>(List.of(UserRole.USER));
+        private List<UserRole> roles = new ArrayList<>(List.of(UserRole.REVENUE_CYCLE_ANALYST));
 
         public boolean isEnabled() {
             return enabled;

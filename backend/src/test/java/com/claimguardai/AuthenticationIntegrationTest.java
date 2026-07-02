@@ -69,7 +69,7 @@ class AuthenticationIntegrationTest {
                 .andExpect(header().exists("X-Correlation-Id"))
                 .andExpect(jsonPath("$.username").value(SEEDED_USERNAME))
                 .andExpect(jsonPath("$.email").value(SEEDED_EMAIL))
-                .andExpect(jsonPath("$.roles[0]").value("USER"));
+                .andExpect(jsonPath("$.roles[0]").value("REVENUE_CYCLE_ANALYST"));
     }
 
     @Test

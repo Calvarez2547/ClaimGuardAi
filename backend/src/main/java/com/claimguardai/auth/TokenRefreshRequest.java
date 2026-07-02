@@ -1,0 +1,7 @@
+package com.claimguardai.auth;
+
+import jakarta.validation.constraints.NotBlank;
+
+public record TokenRefreshRequest(
+        @NotBlank String refreshToken
+) {}

@@ -1,73 +1,95 @@
-# React + TypeScript + Vite
+# ClaimGuard AI Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React, TypeScript, and Vite frontend MVP for the ClaimGuard AI portfolio project.
 
-Currently, two official plugins are available:
+## Scope
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The frontend is a local prototype for authenticated healthcare revenue-cycle claim review. It calls the Spring Boot backend only:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+Frontend -> Spring Boot backend -> optional OpenAI provider
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The frontend never calls OpenAI directly and must not contain API keys, JWT secrets, database passwords, or real PHI.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Local URLs
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:8080`
+
+## Environment
+
+Create or keep `frontend/.env` with:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+## Start the backend
+
+From the repository root:
+
+```bash
+cd backend
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+Default local credentials:
+
+- username: `local.analyst`
+- password: `LocalPass123!`
+
+## Start the frontend
+
+From the repository root:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`.
+
+## MVP Flow
+
+1. Log in with the local demo credentials.
+2. View the dashboard summary backed by `GET /api/dashboard/summary`.
+3. Create a fake/demo claim.
+4. List, search, and filter claims.
+5. Open claim detail.
+6. Update claim workflow status.
+7. Add and view review notes.
+8. Run or re-run backend-owned AI-assisted analysis.
+9. View latest analysis, scoring details, risk factors, recommended actions, and history.
+10. Log out.
+
+## Backend Endpoints Used
+
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+- `GET /api/dashboard/summary`
+- `POST /api/claims`
+- `GET /api/claims`
+- `GET /api/claims/{claimId}`
+- `PATCH /api/claims/{claimId}/status`
+- `POST /api/claims/{claimId}/review-notes`
+- `GET /api/claims/{claimId}/review-notes`
+- `POST /api/claims/{claimId}/analyze`
+- `GET /api/claims/{claimId}/analysis/latest`
+- `GET /api/claims/{claimId}/analysis/history`
+
+## Safety Notes
+
+- Use fake/demo claim data only.
+- Do not enter real PHI.
+- AI output is reviewer support only.
+- Deterministic backend scoring remains the source of truth.
+- This prototype does not claim HIPAA compliance or production readiness.
+
+## Verification
+
+```bash
+npm run build
+npm run lint
 ```

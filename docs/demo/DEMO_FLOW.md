@@ -1,6 +1,6 @@
 # Demo Flow
 
-This guide walks through a recruiter-friendly backend demo of ClaimGuard AI using the current local profile behavior.
+This guide walks through a recruiter-friendly local demo of ClaimGuard AI using the Spring Boot backend and the React frontend MVP.
 
 ## Goal
 
@@ -20,6 +20,7 @@ Demonstrate that the backend can:
 
 - Java 21
 - Maven 3.9+
+- Node.js and npm
 - local terminal with `curl.exe`
 
 ## Start the backend
@@ -39,6 +40,51 @@ Default local AI behavior:
 
 - `AI_ENABLED=false`
 - analysis still works through deterministic fallback behavior
+
+## Start the frontend
+
+From `frontend/`:
+
+```bash
+npm install
+npm run dev
+```
+
+The frontend runs at:
+
+- `http://localhost:5173`
+
+The frontend expects:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+## Browser demo flow
+
+1. Open `http://localhost:5173`.
+2. Log in with `local.analyst` / `LocalPass123!`.
+3. Review the dashboard metric cards, claims by status, risk distribution, recent claims, and recent analyses.
+4. Create a fake/demo claim from the Create Claim page.
+5. Open the Claims page to search, filter, and inspect the claim table.
+6. Open a claim detail page.
+7. Update the claim status if desired.
+8. Add a review note.
+9. Click Analyze Claim or Re-run Analysis.
+10. Review the risk score, risk category, human review flag, AI-assisted narrative, findings, recommended actions, disclaimer, notes, and analysis history.
+11. Log out.
+
+Do not use real PHI. The frontend calls only the backend API and never calls OpenAI directly.
+
+For a larger local dataset, seed fake/demo claims with:
+
+```powershell
+.\scripts\dev\seed-demo-claims.ps1 -ClaimCount 30
+```
+
+See [SEED_DEMO_CLAIMS.md](SEED_DEMO_CLAIMS.md) for 30-claim and 50-claim examples.
+
+## API curl flow
 
 ## 1. Verify health
 

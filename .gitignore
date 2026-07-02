@@ -54,6 +54,10 @@ dist/
 vite.svg
 *.tsbuildinfo
 
+# Electron build output
+release/
+dist-electron/
+
 # Test and generated reports
 test-output/
 reports/

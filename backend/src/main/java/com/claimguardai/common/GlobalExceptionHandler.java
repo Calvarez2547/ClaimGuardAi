@@ -1,6 +1,8 @@
 package com.claimguardai.common;
 
 import com.claimguardai.auth.AuthenticationFailedException;
+import com.claimguardai.auth.InvalidRefreshTokenException;
+import com.claimguardai.auth.UserAlreadyExistsException;
 import com.claimguardai.claims.ClaimNotFoundException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
@@ -102,6 +104,32 @@ public class GlobalExceptionHandler {
                 request);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRefreshTokenException(
+            InvalidRefreshTokenException exception,
+            HttpServletRequest request) {
+
+        ErrorResponse response = errorResponseFactory.build(
+                HttpStatus.UNAUTHORIZED,
+                exception.getMessage(),
+                request);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(
+            UserAlreadyExistsException exception,
+            HttpServletRequest request) {
+
+        ErrorResponse response = errorResponseFactory.build(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request);
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
